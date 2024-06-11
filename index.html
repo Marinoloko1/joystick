@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Joysticks</title>
+</head>
+<body>
+    <div id="joystick1"></div>
+    <div id="joystick2"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js" integrity="sha512-WkQoRWCoNX6HLaYdCCKUS3QfVk6Yk3U7gTgX22yil7QY91pFsBFzTVjhdbXoOLayLHeTre5sZNchk/5SO7FNdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        var joystick1 = nipplejs.create({
+            zone: document.getElementById('joystick1'),
+            mode: 'static',
+            position: { left: '10%', top: '80%' },
+            color: 'red'
+        });
+
+        var joystick2 = nipplejs.create({
+            zone: document.getElementById('joystick2'),
+            mode: 'static',
+            position: { left: '90%', top: '80%' },
+            color: 'blue'
+        });
+    </script>
+</body>
+</html>
