@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joysticks</title>
+    <title>Control de Robot Minisumo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
@@ -11,24 +11,71 @@
 
     </style>
 <body>
-    <div id="joystick1"></div>
-    <div id="joystick2"></div>
+    <div id="joysticks-container">
+        <div id="joystick1"></div>
+        <div id="joystick2"></div>
+    </div>
+    <div id="buttons-container">
+        <button id="adelante">Adelante</button>
+        <button id="atras">Atrás</button>
+        <button id="izquierda">Izquierda</button>
+        <button id="derecha">Derecha</button>
+        <button id="detener">Detener</button>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js" integrity="sha512-WkQoRWCoNX6HLaYdCCKUS3QfVk6Yk3U7gTgX22yil7QY91pFsBFzTVjhdbXoOLayLHeTre5sZNchk/5SO7FNdg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
     <script>
         var joystick1 = nipplejs.create({
             zone: document.getElementById('joystick1'),
             mode: 'static',
-            position: { left: '10%', top: '65%' },
+            position: { left: '50%', top: '50%' },
             color: 'red'
         });
 
         var joystick2 = nipplejs.create({
             zone: document.getElementById('joystick2'),
             mode: 'static',
-            position: { left: '90%', top: '65%' },
+            position: { left: '50%', top: '50%' },
             color: 'blue'
         });
+
+        joystick1.on('move', function (evt, data) {
+            handleJoystickMove(data, 'joystick1');
+        });
+
+        joystick2.on('move', function (evt, data) {
+            handleJoystickMove(data, 'joystick2');
+        });
+
+        document.getElementById('adelante').addEventListener('click', () => enviarComando('adelante'));
+        document.getElementById('atras').addEventListener('click', () => enviarComando('atras'));
+        document.getElementById('izquierda').addEventListener('click', () => enviarComando('izquierda'));
+        document.getElementById('derecha').addEventListener('click', () => enviarComando('derecha'));
+        document.getElementById('detener').addEventListener('click', () => enviarComando('detener'));
+
+        function handleJoystickMove(data, joystickId) {
+            if (data && data.direction) {
+                let direction = data.direction.angle;
+                let force = data.force;
+                console.log(`Joystick: ${joystickId}, Dirección: ${direction}, Fuerza: ${force}`);
+                enviarComando(`${joystickId}-${direction}-${force}`);
+            }
+        }
+
+        function enviarComando(accion) {
+            const url = `http://example.com?accion=${encodeURIComponent(accion)}`;
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Comando enviado exitosamente');
+                    } else {
+                        console.error('Error al enviar el comando');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error de conexión:', error);
+                });
+        }
     </script>
 </body>
 </html>
