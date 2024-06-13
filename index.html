@@ -12,8 +12,56 @@
     </style>
 <body>
     <div id="joysticks-container">
-        <div id="joystick1"></div>
-        <div id="joystick2"></div>
+        <div id="joystick1" class="joystick"></div>
+        <div id="joystick2" class="joystick"></div>
+            <script>
+                document.querySelectorAll('.joystick').forEach(joystick => {
+                    function updateShadow(e) {
+                        let offsetX, offsetY;
+
+                        // Detectar si es evento de ratón o toque
+                        if (e.type === 'mousemove') {
+                            const rect = joystick.getBoundingClientRect();
+                            offsetX = e.clientX - rect.left - rect.width / 2;
+                            offsetY = e.clientY - rect.top - rect.height / 2;
+                        } else if (e.type === 'touchmove') {
+                            const touch = e.touches[0];
+                            const rect = joystick.getBoundingClientRect();
+                            offsetX = touch.clientX - rect.left - rect.width / 2;
+                            offsetY = touch.clientY - rect.top - rect.height / 2;
+                        }
+
+                        // Calcular la dirección y la distancia
+                        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+                        const maxDistance = joystick.offsetWidth / 2;
+                        const limitedDistance = Math.min(distance, maxDistance);
+
+                        // Calcular el ángulo de la dirección del movimiento
+                        const angle = Math.atan2(offsetY, offsetX);
+
+                        // Calcular el desplazamiento de la sombra basado en el ángulo y la distancia
+                        const shadowX = limitedDistance * Math.cos(angle);
+                        const shadowY = limitedDistance * Math.sin(angle);
+
+                        // Aplicar la sombra dinámica al joystick
+                        joystick.style.boxShadow = `${shadowX}px ${shadowY}px 15px rgba(255, 255, 255, 0.5)`;
+                    }
+
+                    function resetShadow() {
+                        joystick.style.boxShadow = `0 0 15px rgba(0, 0, 255, 0.5)`;
+                    }
+
+                    // Eventos para ratón
+                    joystick.addEventListener('mousemove', updateShadow);
+                    joystick.addEventListener('mouseleave', resetShadow);
+
+                    // Eventos para dispositivos táctiles
+                    joystick.addEventListener('touchmove', updateShadow);
+                    joystick.addEventListener('touchend', resetShadow);
+                });
+
+            </script>
+
     </div>
     <div id="buttons-container">
         <button id="adelante">Adelante</button>
@@ -40,18 +88,38 @@
         });
 
         joystick1.on('move', function (evt, data) {
-            handleJoystickMove(data, 'joystick1');
+            //handleJoystickMove(data, 'joystick1');
+    
+                enviarComando("avanzar");
+       
+       
+        
+         
+            console.log(data)
         });
+
+
+        joystick1.on('end', function (evt, data) {
+            //handleJoystickMove(data, 'joystick1');
+    
+                enviarComando("stop");
+       
+       
+        
+         
+            console.log(data)
+        });
+
 
         joystick2.on('move', function (evt, data) {
             handleJoystickMove(data, 'joystick2');
         });
 
-        document.getElementById('adelante').addEventListener('click', () => enviarComando('adelante'));
+        document.getElementById('adelante').addEventListener('click', () => enviarComando('avanzar'));
         document.getElementById('atras').addEventListener('click', () => enviarComando('atras'));
         document.getElementById('izquierda').addEventListener('click', () => enviarComando('izquierda'));
         document.getElementById('derecha').addEventListener('click', () => enviarComando('derecha'));
-        document.getElementById('detener').addEventListener('click', () => enviarComando('detener'));
+        document.getElementById('detener').addEventListener('click', () => enviarComando('stop'));
 
         function handleJoystickMove(data, joystickId) {
             if (data && data.direction) {
@@ -63,7 +131,7 @@
         }
 
         function enviarComando(accion) {
-            const url = `http://example.com?accion=${encodeURIComponent(accion)}`;
+            const url = `http://192.168.4.1/${accion}`;
             fetch(url)
                 .then(response => {
                     if (response.ok) {
