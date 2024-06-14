@@ -11,6 +11,12 @@
 
     </style>
 <body>
+    <div id="video-container">
+        <video autoplay muted loop>
+            <source src="Fondo video Partículas brillantes  cayendo fondo negro HD.mp4" type="video/mp4">
+            Tu navegador no soporta videos HTML5.
+        </video>
+    </div>
     <div id="joysticks-container">
         <div id="joystick1" class="joystick"></div>
         <div id="joystick2" class="joystick"></div>
@@ -43,8 +49,13 @@
                         const shadowX = limitedDistance * Math.cos(angle);
                         const shadowY = limitedDistance * Math.sin(angle);
 
-                        // Aplicar la sombra dinámica al joystick
-                        joystick.style.boxShadow = `${shadowX}px ${shadowY}px 15px rgba(255, 255, 255, 0.5)`;
+                        // Calcular los componentes RGB para el color de la sombra
+                        const r = Math.floor(127 + 127 * Math.cos(angle));
+                        const g = Math.floor(127 + 127 * Math.sin(angle));
+                        const b = Math.floor(127 - 127 * Math.cos(angle));
+
+                        // Aplicar la sombra dinámica al joystick con el color cambiante
+                        joystick.style.boxShadow = `${shadowX}px ${shadowY}px 15px rgba(${r}, ${g}, ${b}, 0.7)`;
                     }
 
                     function resetShadow() {
