@@ -5,65 +5,135 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Robot Minisumo</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
-    <style>
-
-    </style>
+<style>
+</style>
 <body>
+    <div id="rgb-line">
+        <div></div>
+    </div>
+
     <div id="joysticks-container">
         <div id="joystick1" class="joystick"></div>
         <div id="joystick2" class="joystick"></div>
-            <script>
-                document.querySelectorAll('.joystick').forEach(joystick => {
-                    function updateShadow(e) {
-                        let offsetX, offsetY;
+        <script>
+            function animateNeonEffect() {
+                const joysticks = document.querySelectorAll('.joystick');
+                let hue = 0; 
+    
+                function updateColors() {
+                    hue = (hue + 1) % 360; 
+                    const color = `hsl(${hue}, 100%, 50%)`;
+    
+                    joysticks.forEach(joystick => {
+                        joystick.style.boxShadow = `0 0 20px ${color}, 
+                                                    0 0 40px ${color}, 
+                                                    0 0 60px ${color}`;
+                    });
+    
+                    requestAnimationFrame(updateColors);
+                }
+    
+                updateColors();
+            }
+    
+            document.addEventListener('DOMContentLoaded', animateNeonEffect);
 
-                        if (e.type === 'mousemove') {
-                            const rect = joystick.getBoundingClientRect();
-                            offsetX = e.clientX - rect.left - rect.width / 2;
-                            offsetY = e.clientY - rect.top - rect.height / 2;
-                        } else if (e.type === 'touchmove') {
-                            const touch = e.touches[0];
-                            const rect = joystick.getBoundingClientRect();
-                            offsetX = touch.clientX - rect.left - rect.width / 2;
-                            offsetY = touch.clientY - rect.top - rect.height / 2;
-                        }
-
-                        const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
-                        const maxDistance = joystick.offsetWidth / 2;
-                        const limitedDistance = Math.min(distance, maxDistance);
-
-                        const angle = Math.atan2(offsetY, offsetX);
-
-                        const shadowX = limitedDistance * Math.cos(angle);
-                        const shadowY = limitedDistance * Math.sin(angle);
-
-                        const r = Math.floor(127 + 127 * Math.cos(angle));
-                        const g = Math.floor(127 + 127 * Math.sin(angle));
-                        const b = Math.floor(127 - 127 * Math.cos(angle));
-
-                        joystick.style.boxShadow = `${shadowX}px ${shadowY}px 15px rgba(${r}, ${g}, ${b}, 0.7)`;
+            document.querySelectorAll('.joystick').forEach(joystick => {
+                function updateShadow(e) {
+                    let offsetX, offsetY;
+    
+                    if (e.type === 'mousemove') {
+                        const rect = joystick.getBoundingClientRect();
+                        offsetX = e.clientX - rect.left - rect.width / 2;
+                        offsetY = e.clientY - rect.top - rect.height / 2;
+                    } else if (e.type === 'touchmove') {
+                        const touch = e.touches[0];
+                        const rect = joystick.getBoundingClientRect();
+                        offsetX = touch.clientX - rect.left - rect.width / 2;
+                        offsetY = touch.clientY - rect.top - rect.height / 2;
                     }
-
-                    function resetShadow() {
-                        joystick.style.boxShadow = `0 0 15px rgba(0, 0, 255, 0.5)`;
-                    }
-
-                    joystick.addEventListener('mousemove', updateShadow);
-                    joystick.addEventListener('mouseleave', resetShadow);
-
-                    joystick.addEventListener('touchmove', updateShadow);
-                    joystick.addEventListener('touchend', resetShadow);
-                });
-
-            </script>
-
+    
+                    const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
+                    const maxDistance = joystick.offsetWidth / 2;
+                    const limitedDistance = Math.min(distance, maxDistance);
+    
+                    const angle = Math.atan2(offsetY, offsetX);
+    
+                    const shadowX = limitedDistance * Math.cos(angle);
+                    const shadowY = limitedDistance * Math.sin(angle);
+    
+                    const hue = (angle / (2 * Math.PI)) * 360 + 180;
+                    const saturation = 100;
+                    const lightness = 50;
+                    const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    
+                    joystick.style.boxShadow = `${shadowX}px ${shadowY}px 30px ${color}, 
+                                                ${shadowX}px ${shadowY}px 60px ${color}`;
+                    joystick.style.transform = `scale(${1 + limitedDistance / maxDistance * 0.05})`;
+                }
+    
+                function resetShadow() {
+                    joystick.style.boxShadow = `0 0 20px rgba(255, 255, 255, 0.7),
+                                                0 0 40px rgba(255, 255, 255, 0.5),
+                                                0 0 60px rgba(255, 255, 255, 0.3)`;
+                    joystick.style.transform = 'scale(1)';
+                }
+    
+                joystick.addEventListener('mousemove', updateShadow);
+                joystick.addEventListener('mouseleave', resetShadow);
+    
+                joystick.addEventListener('touchmove', updateShadow);
+                joystick.addEventListener('touchend', resetShadow);
+                
+            });
+        </script>
     </div>
-
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
     <script>
+
+        const commandQueue = [];
+
+        function processQueue() {
+            if (commandQueue.length > 0) {
+                const comando = commandQueue.shift(); 
+                enviarComando(comando); 
+            }
+        }
+
+        function enviarComando(accion) {
+            const url = `http://192.168.4.1/${accion}`;
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Comando enviado exitosamente');
+                    } else {
+                        console.error('Error al enviar el comando');
+                    }
+                    processQueue();
+                })
+                .catch(error => {
+                    console.error('Error de conexión:', error);
+                    processQueue();
+                });
+        }
+
+        function handleJoystick1Move(data) {
+            const velocity = data.vector.y;
+            const comando = velocity ? `mover1?velocity=${velocity}` : 'stop1';
+            commandQueue.push(comando);
+            processQueue(); 
+        }
+
+        function handleJoystick2Move(data) {
+            const velocity = data.vector.y;
+            const comando = velocity ? `mover2?velocity=${velocity}` : 'stop2';
+            commandQueue.push(comando); 
+            processQueue(); 
+        }
+
         var joystick1 = nipplejs.create({
             zone: document.getElementById('joystick1'),
             mode: 'static',
@@ -79,66 +149,24 @@
             color: 'blue',
             lockY: true,
         });
-
         joystick1.on('move', function (evt, data) {
-            //handleJoystickMove(data, 'joystick1');
-               
-                enviarComando("mover1?velocity=${data.vector.y}");
-       
-       
-        
-         
-            console.log(data)
+            handleJoystick1Move(data);
         });
-
 
         joystick1.on('end', function (evt, data) {
-            //handleJoystickMove(data, 'joystick1');
-    
-                enviarComando("stop1");
-       
-       
-        
-         
-            console.log(data)
+            commandQueue.push('stop1'); 
+            processQueue(); 
         });
-
 
         joystick2.on('move', function (evt, data) {
-            //handleJoystickMove(data, 'joystick1');
-               
-            enviarComando("mover2?velocity=${data.vector.y}");
-       
-       
-        
-         
-            console.log(data)
-        });
-        joystick2.on('move', function (evt, data) {
-            //handleJoystickMove(data, 'joystick1');
-               
-            enviarComando("stop2");
-       
-       
-        
-         
-            console.log(data)
+            handleJoystick2Move(data);
         });
 
-        function enviarComando(accion) {
-            const url = `http://192.168.4.1/${accion}`;
-            fetch(url)
-                .then(response => {
-                    if (response.ok) {
-                        console.log('Comando enviado exitosamente');
-                    } else {
-                        console.error('Error al enviar el comando');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error de conexión:', error);
-                });
-        }
+        joystick2.on('end', function (evt, data) {
+            commandQueue.push('stop2'); 
+            processQueue(); 
+        });
     </script>
 </body>
 </html>
+
