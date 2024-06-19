@@ -11,12 +11,6 @@
 
     </style>
 <body>
-    <div id="video-container">
-        <video autoplay muted loop>
-            <source src="Fondo video Partículas brillantes  cayendo fondo negro HD.mp4" type="video/mp4">
-            Tu navegador no soporta videos HTML5.
-        </video>
-    </div>
     <div id="joysticks-container">
         <div id="joystick1" class="joystick"></div>
         <div id="joystick2" class="joystick"></div>
@@ -25,7 +19,6 @@
                     function updateShadow(e) {
                         let offsetX, offsetY;
 
-                        // Detectar si es evento de ratón o toque
                         if (e.type === 'mousemove') {
                             const rect = joystick.getBoundingClientRect();
                             offsetX = e.clientX - rect.left - rect.width / 2;
@@ -37,24 +30,19 @@
                             offsetY = touch.clientY - rect.top - rect.height / 2;
                         }
 
-                        // Calcular la dirección y la distancia
                         const distance = Math.sqrt(offsetX * offsetX + offsetY * offsetY);
                         const maxDistance = joystick.offsetWidth / 2;
                         const limitedDistance = Math.min(distance, maxDistance);
 
-                        // Calcular el ángulo de la dirección del movimiento
                         const angle = Math.atan2(offsetY, offsetX);
 
-                        // Calcular el desplazamiento de la sombra basado en el ángulo y la distancia
                         const shadowX = limitedDistance * Math.cos(angle);
                         const shadowY = limitedDistance * Math.sin(angle);
 
-                        // Calcular los componentes RGB para el color de la sombra
                         const r = Math.floor(127 + 127 * Math.cos(angle));
                         const g = Math.floor(127 + 127 * Math.sin(angle));
                         const b = Math.floor(127 - 127 * Math.cos(angle));
 
-                        // Aplicar la sombra dinámica al joystick con el color cambiante
                         joystick.style.boxShadow = `${shadowX}px ${shadowY}px 15px rgba(${r}, ${g}, ${b}, 0.7)`;
                     }
 
@@ -62,11 +50,9 @@
                         joystick.style.boxShadow = `0 0 15px rgba(0, 0, 255, 0.5)`;
                     }
 
-                    // Eventos para ratón
                     joystick.addEventListener('mousemove', updateShadow);
                     joystick.addEventListener('mouseleave', resetShadow);
 
-                    // Eventos para dispositivos táctiles
                     joystick.addEventListener('touchmove', updateShadow);
                     joystick.addEventListener('touchend', resetShadow);
                 });
@@ -74,13 +60,7 @@
             </script>
 
     </div>
-    <div id="buttons-container">
-        <button id="adelante">Adelante</button>
-        <button id="atras">Atrás</button>
-        <button id="izquierda">Izquierda</button>
-        <button id="derecha">Derecha</button>
-        <button id="detener">Detener</button>
-    </div>
+
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
     <script>
@@ -88,20 +68,22 @@
             zone: document.getElementById('joystick1'),
             mode: 'static',
             position: { left: '50%', top: '50%' },
-            color: 'red'
+            color: 'red',
+            lockY: true,
         });
 
         var joystick2 = nipplejs.create({
             zone: document.getElementById('joystick2'),
             mode: 'static',
             position: { left: '50%', top: '50%' },
-            color: 'blue'
+            color: 'blue',
+            lockY: true,
         });
 
         joystick1.on('move', function (evt, data) {
             //handleJoystickMove(data, 'joystick1');
-    
-                enviarComando("avanzar");
+               
+                enviarComando("mover1?velocity=${data.vector.y}");
        
        
         
@@ -113,7 +95,7 @@
         joystick1.on('end', function (evt, data) {
             //handleJoystickMove(data, 'joystick1');
     
-                enviarComando("stop");
+                enviarComando("stop1");
        
        
         
@@ -123,23 +105,25 @@
 
 
         joystick2.on('move', function (evt, data) {
-            handleJoystickMove(data, 'joystick2');
+            //handleJoystickMove(data, 'joystick1');
+               
+            enviarComando("mover2?velocity=${data.vector.y}");
+       
+       
+        
+         
+            console.log(data)
         });
-
-        document.getElementById('adelante').addEventListener('click', () => enviarComando('avanzar'));
-        document.getElementById('atras').addEventListener('click', () => enviarComando('atras'));
-        document.getElementById('izquierda').addEventListener('click', () => enviarComando('izquierda'));
-        document.getElementById('derecha').addEventListener('click', () => enviarComando('derecha'));
-        document.getElementById('detener').addEventListener('click', () => enviarComando('stop'));
-
-        function handleJoystickMove(data, joystickId) {
-            if (data && data.direction) {
-                let direction = data.direction.angle;
-                let force = data.force;
-                console.log(`Joystick: ${joystickId}, Dirección: ${direction}, Fuerza: ${force}`);
-                enviarComando(`${joystickId}-${direction}-${force}`);
-            }
-        }
+        joystick2.on('move', function (evt, data) {
+            //handleJoystickMove(data, 'joystick1');
+               
+            enviarComando("stop2");
+       
+       
+        
+         
+            console.log(data)
+        });
 
         function enviarComando(accion) {
             const url = `http://192.168.4.1/${accion}`;

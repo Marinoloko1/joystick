@@ -1,7 +1,7 @@
 body {
     margin: 0;
     font-family: 'Arial', sans-serif;
-    background-image: url('Fondo\ video\ Partículas\ brillantes\ \ cayendo\ fondo\ negro\ HD.mp4');
+    background-color: black;
     background-size: cover;
     background-position: center;
     display: flex;
@@ -10,21 +10,6 @@ body {
     justify-content: center;
     height: 100vh;
     color: white;
-}
-#video-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Colocar el video detrás del contenido */
-    overflow: hidden;
-}
-
-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* Ajustar el tamaño del video para cubrir completamente el contenedor */
 }
 
 #joysticks-container {
@@ -96,123 +81,4 @@ video {
 
 #joystick2 {
     background: rgba(54, 162, 235, 0.2);
-}
-
-#buttons-container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 15px;
-    max-width: 600px;
-    margin-top: 20px;
-}
-
-button {
-    width: 140px;
-    height: 60px;
-    margin: 10px;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.4em;
-    font-weight: bold;
-    color: white;
-    background: #3498db;
-    cursor: pointer;
-    transition: background 0.3s ease, transform 0.2s;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-button:hover {
-    background: #2980b9;
-    transform: translateY(-2px);
-}
-
-button:active {
-    background: #1f6395;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transform: translateY(2px);
-}
-
-#adelante {
-    background: #2ecc71;
-}
-
-#adelante:hover {
-    background: #27ae60;
-}
-
-#adelante:active {
-    background: #1e8449;
-}
-
-#atras {
-    background: #e74c3c;
-}
-
-#atras:hover {
-    background: #c0392b;
-}
-
-#atras:active {
-    background: #992d22;
-}
-
-#izquierda {
-    background: #f39c12;
-}
-
-#izquierda:hover {
-    background: #e67e22;
-}
-
-#izquierda:active {
-    background: #d35400;
-}
-
-#derecha {
-    background: #8e44ad;
-}
-
-#derecha:hover {
-    background: #7d3c98;
-}
-
-#derecha:active {
-    background: #6c3483;
-}
-
-#detener {
-    background: #34495e;
-}
-
-#detener:hover {
-    background: #2c3e50;
-}
-
-#detener:active {
-    background: #22313f;
-}
-
-@media (max-width: 768px) {
-    #joysticks-container {
-        flex-direction: column;
-        height: auto;
-        padding: 10px 0;
-    }
-
-    #joystick1, #joystick2 {
-        width: 120px;
-        height: 120px;
-        margin-bottom: 20px;
-    }
-
-    button {
-        width: 120px;
-        height: 50px;
-        font-size: 1.2em;
-    }
-
-    #buttons-container {
-        flex-direction: column;
-    }
 }
