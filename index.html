@@ -13,8 +13,7 @@
 
     </style>
 <body>
-   
-    <div><img src="https://aplicacionesinternas.cecyteg.edu.mx:8084/CentroServicio/logo.php"  id="logo"></div>
+
     <div id="joysticks-container">
         <div id="joystick1" class="joystick"></div>
         <div id="joystick2" class="joystick"></div>
@@ -97,6 +96,16 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.2/nipplejs.js"></script>
     <script>
+        
+        const comandos = [];
+
+        function processQueue() {
+            if (comandos.length > 0) {
+                const comando = comandos.shift(); 
+                enviarComando(comando);
+            }
+        }
+
         var joystick1 = nipplejs.create({
             zone: document.getElementById('joystick1'),
             mode: 'static',
@@ -166,12 +175,15 @@
                         console.log('Comando enviado exitosamente');
                     } else {
                         console.error('Error al enviar el comando');
-                    }
+                    } 
+                    enviarComando();
                 })
                 .catch(error => {
                     console.error('Error de conexión:', error);
                 });
         }
     </script>
+       
+       <div><img src="https://aplicacionesinternas.cecyteg.edu.mx:8084/CentroServicio/logo.php"  id="logo"></div>
 </body>
 </html>
