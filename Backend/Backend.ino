@@ -3,10 +3,10 @@
 
 #include <WiFi.h>
 
-#define PIN_A_MOTOR1 13
-#define PIN_B_MOTOR1 4
+#define PIN_A_MOTOR1 19
+#define PIN_B_MOTOR1 21
 #define PIN_A_MOTOR2 5
-#define PIN_B_MOTOR2 24
+#define PIN_B_MOTOR2 18
 
 const char *ssid = "GHOST";
 const char *password = "qwerty123";
@@ -37,77 +37,72 @@ void setup()
     "Servidor ESP32 encendido");
   });
 
-  server.on("/mover1",HTTP_GET,[](AsyncWebServerRequest *request)
+  server.on("/mover",HTTP_GET,[](AsyncWebServerRequest *request)
   {
-    String velocidad_str = request->getParam("velocity")->value();
+    String velocidad_str = request->getParam("velocidad")->value();
     float velocidad = velocidad_str.toInt();
 
-    if(velocidad > 0)
+    String motores = request->getParam("motor")->value();
+    int motor = motores.toInt();
+
+    if(motor == 1)
     {
-      digitalWrite(PIN_A_MOTOR1, HIGH);
-      digitalWrite(PIN_B_MOTOR1, LOW);
-      request->send(200, "text/plain", "OK mover1 avanza");      
+      if(velocidad > 0)
+      {
+        digitalWrite(PIN_A_MOTOR1, HIGH);
+        digitalWrite(PIN_B_MOTOR1, LOW);
+        request->send(200, "text/plain", "OK motor 1 avanza");      
+      } 
+
+      if(velocidad < 0)
+      {
+        digitalWrite(PIN_A_MOTOR1, LOW);
+        digitalWrite(PIN_B_MOTOR1, HIGH);
+        request->send(200, "text/plain", "OK motor 2 retrocede"); 
+      }
+      analogWrite(abs(velocidad)*255, 22);
+    }    
+    
+    if(motor == 2)
+    {
+      if(velocidad > 0)
+      {
+        digitalWrite(PIN_A_MOTOR1, HIGH);
+        digitalWrite(PIN_B_MOTOR1, LOW);
+        request->send(200, "text/plain", "OK motor 2 avanza");      
+      }
+
+      if(velocidad < 0)
+      {
+        digitalWrite(PIN_A_MOTOR1, LOW);
+        digitalWrite(PIN_B_MOTOR1, HIGH);
+        request->send(200, "text/plain", "OK motor 2 retrocede"); 
+      } 
+      analogWrite(abs(velocidad)*255, 23); 
     }
 
-    if(velocidad < 0)
-    {
-      digitalWrite(PIN_A_MOTOR1, LOW);
-      digitalWrite(PIN_B_MOTOR1, HIGH);
-      request->send(200, "text/plain", "OK mover1 retrocede"); 
-    }
-
-    analogWrite(abs(velocidad)*255, 22);
+    
   });
 
- server.on("/mover2",HTTP_GET,[](AsyncWebServerRequest *request)
+  server.on("/stop",HTTP_GET,[](AsyncWebServerRequest *request)
   {
-    String velocidad_str = request->getParam("velocity")->value();
-    float velocidad = velocidad_str.toInt();
+    String motores = request->getParam("motor")->value();
+    int motor = motores.toInt();
 
-    if(velocidad > 0)
-    {
-      digitalWrite(PIN_A_MOTOR1, HIGH);
-      digitalWrite(PIN_B_MOTOR1, LOW);
-      request->send(200, "text/plain", "OK mover2 avanza");      
-    }
-
-    if(velocidad < 0)
-    {
-      digitalWrite(PIN_A_MOTOR1, LOW);
-      digitalWrite(PIN_B_MOTOR1, HIGH);
-      request->send(200, "text/plain", "OK mover2 retrocede"); 
-    } 
-
-    analogWrite(abs(velocidad)*255, 23);
-  });
-
-  server.on("/stop1",HTTP_GET,[](AsyncWebServerRequest *request)
-  {
-    String velocidad_str = request->getParam("velocity")->value();
-    float velocidad = velocidad_str.toInt();
-
-    if(velocidad == 0)
+    if(motor == 1)
     {
       digitalWrite(PIN_A_MOTOR1, LOW);
       digitalWrite(PIN_B_MOTOR1, LOW);
-      request->send(200, "text/plain", "OK stop1 detiene");      
+      request->send(200, "text/plain", "OK motor 1 se detiene");  
     }
-  });
 
-   server.on("/stop2",HTTP_GET,[](AsyncWebServerRequest *request) 
-  {
-    String velocidad_str = request->getParam("velocity")->value();
-    float velocidad =  velocidad_str.toInt();
-
-    if(velocidad == 0)
+    if(motor == 2)
     {
       digitalWrite(PIN_A_MOTOR2, LOW);
       digitalWrite(PIN_B_MOTOR2, LOW);
-      (200, "text/plain", "OK stop2 detiene");      
-    }    
+      request->send(200, "text/plain", "OK motor 2 se detiene");  
+    }       
   });
-
-  
 
   server.begin();
 }
