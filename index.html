@@ -125,7 +125,7 @@
         joystick1.on('move', function (evt, data) {
             //handleJoystickMove(data, 'joystick1');
                
-                enviarComando("mover1?velocidad=${data.vector.y}");
+                enviarComando("mover1?velocidad=${data.vector.y*255}");
        
        
         
@@ -149,7 +149,7 @@
         joystick2.on('move', function (evt, data) {
             //handleJoystickMove(data, 'joystick1');
                
-            enviarComando("mover2?velocidad=${data.vector.y}");
+            enviarComando("mover2?velocidad=${data.vector.y*255}");
        
        
         
